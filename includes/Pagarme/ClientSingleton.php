@@ -127,7 +127,7 @@ class ClientSingleton {
 		}
 
 		// Pagar.me user-agent and api version.
-		$x_pagarme_useragent = 'pagarme-split-woocommerce/' . FN_Dokan_Pagarme_Split::VERSION;
+		$x_pagarme_useragent = 'pagarme-split-woocommerce/1';
 
 		if ( defined( 'WC_VERSION' ) ) {
 			$x_pagarme_useragent .= ' woocommerce/' . WC_VERSION;
