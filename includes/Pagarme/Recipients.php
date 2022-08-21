@@ -5,74 +5,72 @@ namespace PagarmeSplitPayment\Pagarme;
 use PagarmeSplitPayment\Pagarme\ClientSingleton;
 
 class Recipients {
-    private $partnerData, $client;
+	private $partnerData, $client;
 
-    public function __construct()
-    {
-        $this->client = ClientSingleton::getInstance();
-    }
+	public function __construct() {
+		$this->client = ClientSingleton::get_instance();
+	}
 
-    public function createOrUpdate($partnerData)
-    {
-        $this->partnerData = $partnerData;
+	public function createOrUpdate( $partnerData ) {
+		$this->partnerData = $partnerData;
+		$response          = null;
 
-        try {
-            if ($this->partnerData['psp_recipient_id']) {
-                return $this->update();
-            }
+		try {
+			$response = ! empty( $this->partnerData['psp_recipient_id'] ) ? $this->update() : $this->create();
 
-            return $this->create();
-        } catch (\Exception $e) {
-            //TODO: Add a log or something like that.. one day.
-            var_dump($e->getMessage());die;
-        }
-    }
+			if ( ! isset( $response['id'] ) ) {
+				throw new \Exception( print_r( $response, true ) );
+			}
 
-    private function create()
-    {
-        return $this->client->recipients()->create(
-            $this->getPartnerDataFormatted()
-        );
-    }
+			return $response;
+		} catch ( \Exception $e ) {
+			//TODO: Add a log or something like that.. one day.
+			var_dump( $e->getMessage() );
+			die;
+		}
+	}
 
-    private function update()
-    {
-        try {
-            return $this->client->recipients()->update(
-                $this->getPartnerDataFormatted(true)
-            );
-        } catch (\Exception $e) {
-            // Update may fail if Pagar.me account change and recipient doesnt exists
-            // In this case, create another one
-            return $this->create();
-        }
-    }
+	private function create() {
+		return $this->client->create_recipient(
+			$this->getPartnerDataFormatted()
+		);
+	}
 
-    private function getPartnerDataFormatted($update = false)
-    {
-        $formattedPartner = [
-            'bank_account' => [
-                'bank_code' => $this->partnerData['psp_bank_code'],
-                'agencia' => $this->partnerData['psp_agency'],
-                'agencia_dv' => $this->partnerData['psp_agency_digit'],
-                'conta' => $this->partnerData['psp_account'],
-                'conta_dv' => $this->partnerData['psp_account_digit'],
-                'type' => $this->partnerData['psp_account_type'],
-                'document_number' => $this->partnerData['psp_document_number'],
-                'legal_name' => $this->partnerData['psp_legal_name']
-            ],
-        ];
+	private function update() {
+		try {
+			return $this->client->update_recipient(
+				$this->getPartnerDataFormatted( true )
+			);
+		} catch ( \Exception $e ) {
+			// Update may fail if Pagar.me account change and recipient doesnt exists
+			// In this case, create another one
+			return $this->create();
+		}
+	}
 
-        if (!$this->partnerData['psp_agency_digit']) {
-            unset($formattedPartner['bank_account']['agencia_dv']);
-        }
+	private function getPartnerDataFormatted( $update = false ) {
+		$formattedPartner = array(
+			'bank_code'      => $this->partnerData['psp_bank_code'],
+			'agency'         => $this->partnerData['psp_agency'],
+			'agency_digit'   => $this->partnerData['psp_agency_digit'],
+			'account'        => $this->partnerData['psp_account'],
+			'account_digit'  => $this->partnerData['psp_account_digit'],
+			'account_type'   => $this->partnerData['psp_account_type'],
+			'document'       => $this->partnerData['psp_document_number'],
+			'legal_name'     => $this->partnerData['psp_legal_name'],
+			'recipient_type' => $this->partnerData['psp_holder_type'],
+		);
 
-        if (!$update) {
-            return $formattedPartner;
-        }
+		if ( ! $this->partnerData['psp_agency_digit'] ) {
+			unset( $formattedPartner['agency_digit'] );
+		}
 
-        $formattedPartner['id'] = $this->partnerData['psp_recipient_id'];
+		if ( ! $update ) {
+			return $formattedPartner;
+		}
 
-        return $formattedPartner;
-    }
+		$formattedPartner['recipient_id'] = $this->partnerData['psp_recipient_id'];
+
+		return $formattedPartner;
+	}
 }
