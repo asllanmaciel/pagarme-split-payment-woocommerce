@@ -38,7 +38,7 @@ class Actions {
 
         carbon_set_theme_option(
             'psp_partner[0]/psp_recipient_id', 
-            $recipient->id
+            $recipient['id']
         );
     }
 
@@ -67,7 +67,7 @@ class Actions {
         carbon_set_user_meta(
             $partnerId, 
             'psp_partner[0]/psp_recipient_id', 
-            $recipient->id
+            $recipient['id']
         );
     }
 
