@@ -85,6 +85,27 @@ class ClientSingleton {
 		return $response_data;
 	}
 
+	public function update_bank_data( array $recipient_data ) {
+		$response = $this->do_request(
+			'recipients/' . $recipient_data['recipient_id'] . '/default-bank-account',
+			'PATCH',
+			array(
+				'bank_account' => $this->bank_account_data( $recipient_data ),
+			)
+		);
+
+		if ( is_wp_error( $response ) ) {
+			throw new \Exception( $response->get_error_message() );
+		}
+
+		$response_data = json_decode( $response['body'], true );
+
+		if ( ! empty( $response_data['errors'] ) ) {
+			error_log( print_r( $response_data['errors'], true ) );
+			throw new \Exception( 'Não foi possível atualizar dados bancários do recebedor.' );
+		}
+	}
+
 	protected function get_error_message( array $errors, $operation = '' ): string {
 		$errors_w_message = array_filter( $errors, fn( $error ) => isset( $error['message'] ) );
 
