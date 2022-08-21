@@ -12,33 +12,57 @@
  */
 
 defined( 'ABSPATH' ) || exit;
-define('PLUGIN_NAME', 'Pagar.me Split Payment');
+define( 'PLUGIN_NAME', 'Pagar.me Split Payment' );
 
-require_once(__DIR__ . '/vendor/autoload.php');
+require_once( __DIR__ . '/vendor/autoload.php' );
 
 class PagarmeSplitWooCommerce {
-    public static function run()
-    {
-        \Carbon_Fields\Carbon_Fields::boot();
+	public static function run() {
+		\Carbon_Fields\Carbon_Fields::boot();
 
-        // CPTs
-        (new \PagarmeSplitPayment\Cpts\ProductCustomPostType())->create();
-        (new \PagarmeSplitPayment\Cpts\ShopOrderCustomPostType())->create();
+		// CPTs
+		( new \PagarmeSplitPayment\Cpts\ProductCustomPostType() )->create();
+		( new \PagarmeSplitPayment\Cpts\ShopOrderCustomPostType() )->create();
 
-        // Business rules
-        (new \PagarmeSplitPayment\Pagarme\SplitRules())->addSplit();
+		// Business rules
+		( new \PagarmeSplitPayment\Pagarme\SplitRules() )->addSplit();
 
-        // Admin
-        (new \PagarmeSplitPayment\Admin\Actions())
-            ->createRecipients()
-            ->createAdminNotices();
-        (new \PagarmeSplitPayment\Admin\PluginOptions())->create();
+		// Admin
+		( new \PagarmeSplitPayment\Admin\Actions() )
+			->createRecipients()
+			->createAdminNotices();
+		( new \PagarmeSplitPayment\Admin\PluginOptions() )->create();
 
-        // Roles
-        (new \PagarmeSplitPayment\Roles\PartnerRole())->create();
-    }
+		// Roles
+		( new \PagarmeSplitPayment\Roles\PartnerRole() )->create();
+
+		add_filter( 'woocommerce_settings_api_form_fields_woo-pagarme-payments', array( self::class, 'add_secret_key_field' ) );
+	}
+
+	public static function add_secret_key_field( array $fields ) {
+		$start_fields_key = array_slice( array_keys( $fields ), 0, 2 );
+		$end_fields_key   = array_slice( array_keys( $fields ), 2 );
+		$new_fields       = array();
+		foreach ( $start_fields_key as $field_key ) {
+			$new_fields[ $field_key ] = $fields[ $field_key ];
+		}
+
+		$new_fields['api_sk'] = array(
+			'title' => 'Secret Key',
+			'type'  => 'text',
+		);
+
+		foreach ( $end_fields_key as $field_key ) {
+			$new_fields[ $field_key ] = $fields[ $field_key ];
+		}
+
+		return $new_fields;
+	}
 }
 
-add_action('after_setup_theme', function() {
-    PagarmeSplitWooCommerce::run();
-});
+add_action(
+	'after_setup_theme',
+	function() {
+		PagarmeSplitWooCommerce::run();
+	}
+);
