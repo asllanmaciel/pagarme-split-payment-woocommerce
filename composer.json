@@ -1,7 +1,6 @@
 {
     "require": {
-        "htmlburger/carbon-fields": "^3.1",
-        "pagarme/pagarme-php": "^4.0"
+        "htmlburger/carbon-fields": "^3.1"
     },
     "autoload": {
         "psr-4": {
