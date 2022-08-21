@@ -58,12 +58,16 @@ class RecipientFieldGroup implements FieldGroup
                         'psp_account_type',
                         __('Account type')
                     )->add_options([
-                        'conta_corrente' => __('Current account'),
-                        'conta_poupanca' => __('Savings account'),
-                        'conta_corrente_conjunta' => __('Joint current account'),
-                        'conta_poupanca_conjunta' => __('Joint savings account'),
+                        'checking' => __('Conta Corrente'),
+                        'savings' => __('Poupança'),
                     ])->set_width(50)
                         ->set_required(true),
+                    Field::make('select', 'psp_holder_type', 'Tipo Recebedor')
+                        ->set_width(50)
+                        ->add_options([
+                            'individual' => 'Pessoa Física',
+                            'company' => 'Pessoa Jurídica'
+                        ]),
                     Field::make(
                         'text',
                         'psp_document_number',
@@ -76,7 +80,8 @@ class RecipientFieldGroup implements FieldGroup
                         'psp_legal_name',
                         __('Legal name')
                     )->set_attribute('maxLength', 30)
-                        ->set_required(true),
+                        ->set_required(true)
+                        ->set_width(50),
                 ])->set_min(1)
                 ->set_max(1)
         ];
