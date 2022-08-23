@@ -62,7 +62,6 @@ class PagarmeSplitWooCommerce {
 	}
 
 	public static function override_api_service_on_plugin_update( $upgrader_object, $options ) {
-		error_log(print_r($options, true));
 		if ( $options['action'] == 'update' && $options['type'] == 'plugin' ) {
 			foreach ( $options['plugins'] as $each_plugin ) {
 				if ( preg_match_all( '/woo-pagarme-payments/', $each_plugin ) )
