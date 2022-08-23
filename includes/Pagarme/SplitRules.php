@@ -55,7 +55,7 @@ class SplitRules {
 			}
 			$split_request              = new CreateSplitRequest();
 			$split_request->recipientId = $partnerData['psp_recipient_id'];
-			$split_request->amount      = Helper::priceInCents( $partner['value'] );
+			$split_request->amount      = round(Helper::priceInCents( $partner['value'] ));
 			$split_request->type        = 'flat';
 
 			$split_request->options                      = new CreateSplitOptionsRequest();
@@ -70,7 +70,7 @@ class SplitRules {
 		foreach ( $order_request->payments as $payment_request ) {
 			$split_request              = new CreateSplitRequest();
 			$split_request->recipientId = $mainRecipientData[0]['psp_recipient_id'];
-			$split_request->amount      = Helper::priceInCents( $order->get_total() ) - $partnersAmount;
+			$split_request->amount      = round(Helper::priceInCents( $order->get_total() ) - $partnersAmount);
 			$split_request->type        = 'flat';
 
 			$split_request->options                      = new CreateSplitOptionsRequest();
