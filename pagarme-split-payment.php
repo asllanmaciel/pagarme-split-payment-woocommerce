@@ -37,6 +37,38 @@ class PagarmeSplitWooCommerce {
 		( new \PagarmeSplitPayment\Roles\PartnerRole() )->create();
 
 		add_filter( 'woocommerce_settings_api_form_fields_woo-pagarme-payments', array( self::class, 'add_secret_key_field' ) );
+		add_action( 'upgrader_process_complete', array( self::class, 'override_api_service_on_plugin_update' ), 10, 2 );
+		add_action( 'activate_pagarme-payments-for-woocommerce/woo-pagarme-payments.php', function() {
+			self::override_api_service_ecommerce_module_core('pagarme-payments-for-woocommerce/woo-pagarme-payments.php');
+		} );
+	}
+
+	public static function override_api_service_ecommerce_module_core( string $pagarme_plugin_id ) {
+		$plugin_foder = explode( '/', $pagarme_plugin_id )[0];
+
+		if ( empty( $plugin_foder ) ) {
+			return;
+		}
+
+		$creds = request_filesystem_credentials( site_url() . '/wp-admin/', '', false, false, array() );
+		WP_Filesystem( $creds );
+
+		global $wp_filesystem;
+		$api_service_path = WP_PLUGIN_DIR . '/' . $plugin_foder . '/vendor/pagarme/ecommerce-module-core/src/Kernel/Services/APIService.php';
+		if ( $wp_filesystem->exists( $api_service_path ) ) {
+			$wp_filesystem->delete( $api_service_path );
+		}
+		$wp_filesystem->copy( plugin_dir_path( __FILE__ ) . '/APIService.php', $api_service_path );
+	}
+
+	public static function override_api_service_on_plugin_update( $upgrader_object, $options ) {
+		error_log(print_r($options, true));
+		if ( $options['action'] == 'update' && $options['type'] == 'plugin' ) {
+			foreach ( $options['plugins'] as $each_plugin ) {
+				if ( preg_match_all( '/woo-pagarme-payments/', $each_plugin ) )
+					self::override_api_service_ecommerce_module_core( 'pagarme-payments-for-woocommerce/woo-pagarme-payments.php' );
+			}
+		}
 	}
 
 	public static function add_secret_key_field( array $fields ) {
@@ -64,5 +96,18 @@ add_action(
 	'after_setup_theme',
 	function() {
 		PagarmeSplitWooCommerce::run();
+	}
+);
+
+register_activation_hook(
+	__FILE__,
+	function() {
+		$plugins = get_plugins();
+		foreach ( $plugins as $key => $plugin ) {
+			if ( $plugin['TextDomain'] == 'woo-pagarme-payments' ) {
+				PagarmeSplitWooCommerce::override_api_service_ecommerce_module_core( $key );
+				return;
+			}
+		}
 	}
 );
