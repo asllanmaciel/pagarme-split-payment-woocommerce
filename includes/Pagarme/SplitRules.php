@@ -54,6 +54,8 @@ class SplitRules {
 				$payment_request->split = array();
 			}
 			$split_request              = new CreateSplitRequest();
+			
+			/*
 			$split_request->recipientId = $partnerData['psp_recipient_id'];
 			$split_request->amount      = round(Helper::priceInCents( $partner['value'] ));
 			$split_request->type        = 'flat';
@@ -61,6 +63,15 @@ class SplitRules {
 			$split_request->options                      = new CreateSplitOptionsRequest();
 			$split_request->options->liable              = true;
 			$split_request->options->chargeProcessingFee = true;
+			*/
+			
+			$split_request->recipient_id = $partnerData['psp_recipient_id'];
+			$split_request->amount      = round(Helper::priceInCents( $partner['value'] ));
+			$split_request->type        = 'flat';
+
+			$split_request->options                      = new CreateSplitOptionsRequest();
+			$split_request->options->liable              = true;
+			$split_request->options->charge_processing_fee = true;
 
 			$payment_request->split[] = $split_request;
 		}
@@ -69,6 +80,8 @@ class SplitRules {
 	protected function create_main_recipient_split( $mainRecipientData, $partnersAmount, $order, $order_request ) {
 		foreach ( $order_request->payments as $payment_request ) {
 			$split_request              = new CreateSplitRequest();
+			
+			/*
 			$split_request->recipientId = $mainRecipientData[0]['psp_recipient_id'];
 			$split_request->amount      = round(Helper::priceInCents( $order->get_total() ) - $partnersAmount);
 			$split_request->type        = 'flat';
@@ -77,6 +90,16 @@ class SplitRules {
 			$split_request->options->liable              = true;
 			$split_request->options->chargeProcessingFee = true;
 			$split_request->options->chargeRemainderFee  = true;
+			*/
+
+			$split_request->recipient_id = $mainRecipientData[0]['psp_recipient_id'];
+			$split_request->amount      = round(Helper::priceInCents( $order->get_total() ) - $partnersAmount);
+			$split_request->type        = 'flat';
+
+			$split_request->options                      = new CreateSplitOptionsRequest();
+			$split_request->options->liable              = true;
+			$split_request->options->charge_processing_fee = true;
+			$split_request->options->charge_remainder  = true;
 
 			if ( ! is_array( $payment_request->split ) ) {
 				$payment_request->split = array();

@@ -58,8 +58,10 @@ class RecipientFieldGroup implements FieldGroup
                         'psp_account_type',
                         __('Account type')
                     )->add_options([
-                        'checking' => __('Conta Corrente'),
-                        'savings' => __('Poupança'),
+                        'conta_corrente' => __('Conta Corrente'),
+                        'conta_poupanca' => __('Poupança'),
+                        'conta_corrente_conjunta' => __('Corrente Conjunta'),
+                        'conta_poupanca_conjunta' => __('Poupança Conjunta'),
                     ])->set_width(50)
                         ->set_required(true),
                     Field::make('select', 'psp_holder_type', 'Tipo Recebedor')

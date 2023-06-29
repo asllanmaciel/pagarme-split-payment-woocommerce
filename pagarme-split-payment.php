@@ -2,9 +2,9 @@
 /**
  * Plugin Name: Pagar.me Split Payment for WooCommerce
  * Description: Allow you to define partners to split payment with using Pagar.me gateway.
- * Version: 1.2.1
- * Author: Insus Tecnologia
- * Author URI: https://insus.com.br
+ * Version: 1.3.1
+ * Author: WP24Horas
+ * Author URI: https://wp24horas.com.br
  * Text Domain: pagarme-split-payment
  * Domain Path: /i18n/languages/
  *
@@ -55,6 +55,9 @@ class PagarmeSplitWooCommerce {
 
 		global $wp_filesystem;
 		$api_service_path = WP_PLUGIN_DIR . '/' . $plugin_foder . '/vendor/pagarme/ecommerce-module-core/src/Kernel/Services/APIService.php';
+
+		echo $api_service_path;
+		
 		if ( $wp_filesystem->exists( $api_service_path ) ) {
 			$wp_filesystem->delete( $api_service_path );
 		}
@@ -78,7 +81,7 @@ class PagarmeSplitWooCommerce {
 			$new_fields[ $field_key ] = $fields[ $field_key ];
 		}
 
-		$new_fields['api_sk'] = array(
+		$new_fields['api_key'] = array(
 			'title' => 'Secret Key',
 			'type'  => 'text',
 		);

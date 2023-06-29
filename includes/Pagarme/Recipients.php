@@ -61,9 +61,9 @@ class Recipients {
 			'recipient_type' => $this->partnerData['psp_holder_type'],
 		);
 
-		if ( ! $this->partnerData['psp_agency_digit'] ) {
+		/*if ( ! $this->partnerData['psp_agency_digit'] ) {
 			unset( $formattedPartner['agency_digit'] );
-		}
+		}*/
 
 		if ( ! $update ) {
 			return $formattedPartner;

@@ -27,20 +27,24 @@ class Role {
     {
         $currentRole = get_role($this->role);
 
-        $intersect = array_intersect_assoc(
-            $currentRole->capabilities,
-            $this->capabilities
-        );
+        if (is_object($currentRole)) {
 
-        if (
-            $currentRole && // Role exists
-            (
-                count($intersect) !== count($currentRole->capabilities) ||
-                count($intersect) !== count($this->capabilities)
-            ) // Capabilities outdated
-        ) {
-            remove_role($this->role);
-        }
+            $intersect = array_intersect_assoc(
+                $currentRole->capabilities,
+                $this->capabilities
+            );
+
+            if (
+                $currentRole && // Role exists
+                (
+                    count($intersect) !== count($currentRole->capabilities) ||
+                    count($intersect) !== count($this->capabilities)
+                ) // Capabilities outdated
+            ) {
+                remove_role($this->role);
+            }
+
+        }        
 
         // If admin doesnt have some custom caps, add it to him
         $admin_role = get_role('administrator');
